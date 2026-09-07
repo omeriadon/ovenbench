@@ -2,7 +2,10 @@
 
 OvenBench is a Nightly-connected transaction benchmark for Cookie Chain.
 
-It measures **broadcast → confirmed latency using real signed transactions**, then links every sample to its Cookiescan receipt. Wallet signing completes before timing starts, so the benchmark measures the browser/RPC/network path rather than user reaction time.
+**Live app:** https://ovenbench-omeriadons-projects.vercel.app  
+**Source:** https://github.com/omeriadon/ovenbench
+
+It measures **broadcast → confirmed latency using real signed transactions**, then links every successful sample to its Cookiescan receipt. Wallet signing completes before timing starts, so the benchmark measures the browser/RPC/network path rather than user reaction time.
 
 ## What it demonstrates
 
@@ -33,12 +36,25 @@ No value is transferred during a benchmark. Each sample invokes Solana's Memo pr
 
 ## Run locally
 
+Requirements: Node.js 20+ and Nightly Wallet.
+
 ```bash
 npm install
 npm run dev
 ```
 
 Open `http://localhost:3000`, connect Nightly, select Cookie Chain as a custom SVM RPC if required, and run a benchmark.
+
+## Nightly / Cookie Chain setup
+
+Cookie Chain is an independent SVM network. In Nightly, add or select a custom Solana/SVM network using:
+
+```text
+RPC: https://rpc.cookiescan.io
+WebSocket: wss://wss.cookiescan.io
+```
+
+OvenBench compares Nightly's active genesis hash with the genesis returned by the configured Cookie Chain RPC and blocks signing if they differ.
 
 ## Benchmark method
 
@@ -48,9 +64,22 @@ Open `http://localhost:3000`, connect Nightly, select Cookie Chain as a custom S
 4. Broadcast signed transactions concurrently.
 5. Measure each transaction from immediately before `sendRawTransaction` until `confirmed` commitment.
 6. Fetch transaction metadata and display fee, slot, and Cookiescan receipt.
-7. Calculate p50, p95, and fastest confirmation latency from successful samples.
+7. Calculate p50, p95, fastest confirmation latency, and average fee from successful samples.
 
 The measurement includes browser ↔ RPC latency and therefore is not a protocol-level finality guarantee.
+
+## Validation status
+
+Verified on the public deployment:
+
+- Cookie Chain RPC data loads successfully
+- current slot, block height and observed TPS render
+- Nightly connects successfully on the Cookie Chain custom network
+- connected wallet address renders
+- native COOK balance is read from Cookie Chain
+- production and responsive UI render correctly
+
+A funded-wallet transaction run is recorded separately in `SUBMISSION.md` before final bounty submission.
 
 ## Safety
 
